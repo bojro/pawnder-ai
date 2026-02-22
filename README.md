@@ -8,6 +8,10 @@
   <strong>Cornell 2026 Animal Science Hackathon</strong>
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/MNTTCqhk4xE">▶️ Watch the Demo on YouTube</a>
+</p>
+
 ---
 
 ## The Problem
