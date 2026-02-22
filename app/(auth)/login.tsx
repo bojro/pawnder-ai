@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -88,7 +89,11 @@ export default function LoginScreen() {
             {/* Hero */}
             <View style={styles.hero}>
               <Text style={styles.welcome}>Welcome to</Text>
-              <Text style={styles.brand}>Pawnder.</Text>
+              <Image
+                source={require('../../assets/pawnder-logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
               <Text style={styles.tagline}>
                 Find your perfect companion through behavioral compatibility.
               </Text>
@@ -213,10 +218,10 @@ const styles = StyleSheet.create({
     ...typography.bodyLg,
     color: colors.gray600,
   },
-  brand: {
-    ...typography.displayLg,
-    fontSize: 48,
-    color: colors.teal,
+  logo: {
+    width: 240,
+    height: 64,
+    alignSelf: 'flex-start',
     marginTop: 4,
   },
   tagline: {
