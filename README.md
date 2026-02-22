@@ -118,9 +118,6 @@ Profile creation --> Behavioral onboarding --> Swipe through ranked matches --> 
 | **State Management** | Zustand |
 | **Backend** | Firebase (Auth, Firestore, Cloud Functions) |
 | **AI** | Google Gemini 2.0 Flash (personalized match narratives) |
-| **Gestures & Animation** | React Native Gesture Handler, Reanimated 4 |
-| **UI** | Custom design system (Inter + Playfair Display, warm teal/cream palette) |
-| **Swipe Engine** | react-native-deck-swiper |
 
 ---
 
@@ -154,53 +151,10 @@ Built at the **Cornell 2026 Animal Science Hackathon** by four close friends who
 
 | Name | Role | Major |
 |---|---|---|
-| **Badi Patel** | Lead Engineer | Computer Science |
-| **Audrey Chen** | Engineer | Computer Science |
-| **Kevin Yan** | Business & Strategy | Applied Economics & Management |
-| **Jaelyn Chow** | Animal Behavior & Research | Animal Science |
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- Expo CLI (`npm install -g expo-cli`)
-- Expo Go app on your phone (for testing)
-
-### Setup
-
-```bash
-# Clone the repo
-git clone https://github.com/your-username/pawnder-ai.git
-cd pawnder-ai
-
-# Install dependencies
-npm install
-
-# Create your .env file with Firebase + Gemini keys
-cp .env.example .env
-# Edit .env with your API keys
-
-# Start the development server
-npx expo start --clear
-```
-
-Scan the QR code with Expo Go to run on your device.
-
-### Environment Variables
-
-| Variable | Description |
-|---|---|
-| `EXPO_PUBLIC_FIREBASE_API_KEY` | Firebase web API key |
-| `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
-| `EXPO_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
-| `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
-| `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
-| `EXPO_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
-| `EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID` | Firebase analytics measurement ID |
-| `EXPO_PUBLIC_GEMINI_API_KEY` | Google Gemini API key |
+| [**Bojro Das**](https://www.linkedin.com/in/bojro/) | Lead Engineer, Research | Computer Science + Math |
+| [**Audrey Chen**](https://www.linkedin.com/in/audrey-chen-3782ba28a/) | Engineer | Computer Science |
+| [**Kevin Yan**](https://www.linkedin.com/in/kevinyan18/) | Business & Strategy, Research | Applied Economics & Management |
+| [**Jaelyn Chow**](https://www.linkedin.com/in/jaelyn-chow/) | Animal Behavior, Research | Animal Science |
 
 ---
 
