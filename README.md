@@ -8,9 +8,12 @@
   <strong>Cornell 2026 Animal Science Hackathon</strong>
 </p>
 
-<p align="center">
+<!-- <p align="center">
   <a href="https://youtu.be/MNTTCqhk4xE">▶️ Watch the Demo on YouTube</a>
-</p>
+</p> -->
+[![Watch the video](https://img.youtube.com/vi/MNTTCqhk4xE/maxresdefault.jpg)](https://youtu.be/MNTTCqhk4xE)
+
+### [Check out the demo on YouTube!](https://youtu.be/MNTTCqhk4xE)
 
 ---
 
