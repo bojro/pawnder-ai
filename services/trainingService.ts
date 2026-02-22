@@ -4,7 +4,7 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { mockTrainingPlan } from './mockData';
 import { useAppStore } from '../store/useAppStore';
 import { TrainingPlan } from '../types';
@@ -21,6 +21,7 @@ export const trainingService = {
       return {
         id: matchId,
         matchId,
+        adopterId: auth.currentUser?.uid || '',
         weeks: [],
         completionPercent: 0,
         premiumUpsellAvailable: true,
@@ -31,7 +32,12 @@ export const trainingService = {
 
   async saveTrainingPlan(plan: TrainingPlan): Promise<void> {
     const ref = doc(db, 'trainingPlans', plan.matchId);
-    await setDoc(ref, plan);
+    // Ensure adopterId is set for Firestore security rules
+    const planWithOwner = {
+      ...plan,
+      adopterId: plan.adopterId || auth.currentUser?.uid || '',
+    };
+    await setDoc(ref, planWithOwner);
   },
 
   async toggleTaskCompletion(

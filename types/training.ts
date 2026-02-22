@@ -16,6 +16,7 @@ export interface TrainingWeek {
 export interface TrainingPlan {
   id: string;
   matchId: string;
+  adopterId?: string;
   weeks: TrainingWeek[];
   completionPercent: number;
   premiumUpsellAvailable: boolean;
