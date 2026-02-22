@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Adopters ───
+    // Only the owner (matching Firebase Auth uid) can read/write their own doc
+    match /adopters/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ─── Shelter Pets ───
+    // Any authenticated user can read (for adopter browsing).
+    // Only the shelter user who created the pet can write.
+    match /shelterPets/{petId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.shelterId == request.auth.uid;
+    }
+
+    // ─── Swipes ───
+    // Authenticated users can create swipes for themselves.
+    // Read own swipes only.
+    match /swipes/{swipeId} {
+      allow create: if request.auth != null
+        && request.resource.data.adopterId == request.auth.uid;
+      allow read: if request.auth != null
+        && resource.data.adopterId == request.auth.uid;
+    }
+
+    // ─── Matches ───
+    // Create if authenticated; read if adopter is participant.
+    match /matches/{matchId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null
+        && resource.data.adopterId == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.adopterId == request.auth.uid;
+    }
+
+    // ─── Check-ins ───
+    // Create if authenticated; read own check-ins.
+    match /checkins/{checkinId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null
+        && resource.data.adopterId == request.auth.uid;
+    }
+
+    // ─── Training Plans ───
+    // Read/write for the adopter who owns the associated match.
+    // For simplicity, allow authenticated read/write (match-level auth checked in app).
+    match /trainingPlans/{planId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ─── Visit Slots ───
+    // Anyone authenticated can read (to see available times).
+    match /visitSlots/{slotId} {
+      allow read: if request.auth != null;
+    }
+
+    // ─── Visits ───
+    // Create if authenticated; read own visits.
+    match /visits/{visitId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+    }
+  }
+}

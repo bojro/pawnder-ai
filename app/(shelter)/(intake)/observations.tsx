@@ -41,7 +41,7 @@ export default function IntakeObservations() {
       subtitle="Summarize strengths, challenges, and notes."
       currentStep={7}
       totalSteps={TOTAL_INTAKE_STEPS}
-      onNext={() => router.push('/(shelter)/(intake)/media')}
+      onNext={() => router.push('/(shelter)/(intake)/availability')}
     >
       <View style={styles.content}>
         {/* Strengths */}

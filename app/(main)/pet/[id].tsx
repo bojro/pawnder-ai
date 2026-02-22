@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import PetImageCarousel from '../../../components/PetImageCarousel';
 import CompatibilityBadge from '../../../components/CompatibilityBadge';
@@ -8,6 +8,8 @@ import ExplainabilityCard from '../../../components/ExplainabilityCard';
 import Button from '../../../components/ui/Button';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 import { usePets } from '../../../hooks/usePets';
+import { useAppStore } from '../../../store/useAppStore';
+import { generateWhyYouMatch } from '../../../services/geminiService';
 import { PetWithCompatibility } from '../../../types';
 import { colors, typography, spacing, radii, shadows } from '../../../utils/theme';
 import { capitalizeFirst } from '../../../utils/formatters';
@@ -17,6 +19,7 @@ export default function PetDetailScreen() {
   const { fetchPetById } = usePets();
   const [pet, setPet] = useState<PetWithCompatibility | null>(null);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -28,6 +31,43 @@ export default function PetDetailScreen() {
     const data = await fetchPetById(id!);
     setPet(data);
     setLoading(false);
+
+    // After showing the pet with rule-based data, request Gemini narrative
+    if (data) {
+      fetchGeminiNarrative(data);
+    }
+  };
+
+  /**
+   * Call Gemini directly to get a personalized "why you match" narrative.
+   * Falls back silently to the rule-based data already shown if it fails.
+   */
+  const fetchGeminiNarrative = async (currentPet: PetWithCompatibility) => {
+    const adopterId = useAppStore.getState().adopterId;
+    const isMock = useAppStore.getState().mockMode;
+
+    // Skip in mock mode or if no adopter
+    if (isMock || !adopterId) return;
+
+    setAiLoading(true);
+    try {
+      const result = await generateWhyYouMatch(adopterId, currentPet.id);
+
+      setPet((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          whyMatch: result.whyMatch.length > 0 ? result.whyMatch : prev.whyMatch,
+          potentialChallenges:
+            result.challenges.length > 0 ? result.challenges : prev.potentialChallenges,
+        };
+      });
+    } catch (err) {
+      // Silently fall back to rule-based data — no user-facing error
+      console.warn('Gemini narrative unavailable, using rule-based data:', err);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   if (loading) return <LoadingOverlay visible />;
@@ -55,10 +95,12 @@ export default function PetDetailScreen() {
         </Text>
       </View>
 
-      <View style={[styles.card, shadows.card]}>
-        <Text style={styles.cardLabel}>About</Text>
-        <Text style={styles.cardBody}>{pet.aiSummary}</Text>
-      </View>
+      {pet.aiSummary ? (
+        <View style={[styles.card, shadows.card]}>
+          <Text style={styles.cardLabel}>About</Text>
+          <Text style={styles.cardBody}>{pet.aiSummary}</Text>
+        </View>
+      ) : null}
 
       {pet.specialNeeds && (
         <View style={[styles.card, shadows.card, styles.specialNeedsCard]}>
@@ -67,16 +109,18 @@ export default function PetDetailScreen() {
         </View>
       )}
 
-      <View style={[styles.card, shadows.card]}>
-        <Text style={styles.cardLabel}>Behavior Traits</Text>
-        <View style={styles.traitsRow}>
-          {pet.behaviorTraits.map((trait) => (
-            <View key={trait} style={styles.traitChip}>
-              <Text style={styles.traitText}>{capitalizeFirst(trait)}</Text>
-            </View>
-          ))}
+      {pet.behaviorTraits.length > 0 && (
+        <View style={[styles.card, shadows.card]}>
+          <Text style={styles.cardLabel}>Behavior Traits</Text>
+          <View style={styles.traitsRow}>
+            {pet.behaviorTraits.map((trait) => (
+              <View key={trait} style={styles.traitChip}>
+                <Text style={styles.traitText}>{capitalizeFirst(trait)}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
+      )}
 
       <View style={[styles.card, shadows.card]}>
         <Text style={styles.cardLabel}>Ratings</Text>
@@ -90,6 +134,7 @@ export default function PetDetailScreen() {
       <ExplainabilityCard
         whyMatch={pet.whyMatch}
         potentialChallenges={pet.potentialChallenges}
+        loading={aiLoading}
       />
 
       <View style={styles.ctaContainer}>

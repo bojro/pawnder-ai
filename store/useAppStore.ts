@@ -70,7 +70,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   stabilitySummary: null,
 
   // UI
-  mockMode: true, // Start in mock mode for hackathon
+  mockMode: false,
   isLoading: false,
   error: null,
 

@@ -6,12 +6,17 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShelterStore } from '../../store/useShelterStore';
 import { mockShelterPets } from '../../services/shelterMockData';
+import { useAppStore } from '../../store/useAppStore';
+import { useMockMode } from '../../hooks/useMockMode';
+import ToggleSwitch from '../../components/ui/ToggleSwitch';
 import PetListCard from '../../components/shelter/PetListCard';
 import { PetStatus, ShelterPet } from '../../types/shelter';
 import { colors, typography, spacing, radii, shadows } from '../../utils/theme';
@@ -20,13 +25,14 @@ type FilterOption = 'all' | PetStatus;
 
 export default function ShelterDashboard() {
   const { shelterPets, isLoaded, loadFromStorage, startNewPet } = useShelterStore();
+  const { mockMode, toggleMockMode } = useMockMode();
   const [filter, setFilter] = useState<FilterOption>('all');
 
   useEffect(() => {
     loadFromStorage().then(() => {
-      // Seed with mock data if empty
+      // Seed with mock data only in mock mode and if empty
       const store = useShelterStore.getState();
-      if (store.shelterPets.length === 0) {
+      if (useAppStore.getState().mockMode && store.shelterPets.length === 0) {
         useShelterStore.setState({ shelterPets: mockShelterPets });
       }
     });
@@ -36,7 +42,40 @@ export default function ShelterDashboard() {
     ? shelterPets
     : shelterPets.filter(p => p.status === filter);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+    try {
+      const draftJson = await AsyncStorage.getItem('pawnder_shelter_current_draft');
+      if (draftJson) {
+        const saved = JSON.parse(draftJson);
+        const draftName = saved?.draft?.name?.trim();
+        if (draftName) {
+          Alert.alert(
+            'Resume Draft?',
+            `You have an unsaved draft for "${draftName}". Would you like to resume it?`,
+            [
+              {
+                text: 'Start Fresh',
+                style: 'destructive',
+                onPress: () => {
+                  startNewPet();
+                  router.push('/(shelter)/(intake)');
+                },
+              },
+              {
+                text: 'Resume',
+                onPress: () => {
+                  // Draft is already loaded from storage via loadFromStorage
+                  router.push('/(shelter)/(intake)');
+                },
+              },
+            ],
+          );
+          return;
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
     startNewPet();
     router.push('/(shelter)/(intake)');
   };
@@ -52,7 +91,10 @@ export default function ShelterDashboard() {
 
   const handleLogout = async () => {
     const { clearAll } = await import('../../utils/storage');
+    const { signOut } = await import('firebase/auth');
+    const { auth } = await import('../../services/firebase');
     await clearAll();
+    try { await signOut(auth); } catch (e) {}
     router.replace('/(auth)/login');
   };
 
@@ -82,6 +124,16 @@ export default function ShelterDashboard() {
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Ionicons name="log-out-outline" size={22} color={colors.gray600} />
         </TouchableOpacity>
+      </View>
+
+      {/* Mock Mode Toggle */}
+      <View style={styles.mockRow}>
+        <View style={styles.mockInfo}>
+          <Ionicons name="code-slash-outline" size={16} color={colors.gray400} />
+          <Text style={styles.mockLabel}>Mock Mode</Text>
+          <Text style={styles.mockHint}>{mockMode ? 'Local data' : 'Firebase'}</Text>
+        </View>
+        <ToggleSwitch value={mockMode} onToggle={toggleMockMode} />
       </View>
 
       {/* Filters */}
@@ -156,6 +208,33 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     padding: spacing.sm,
+  },
+  mockRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.screenPadding,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.white,
+    marginHorizontal: spacing.screenPadding,
+    borderRadius: radii.card,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.md,
+  },
+  mockInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  mockLabel: {
+    ...typography.labelSm,
+    color: colors.charcoal,
+  },
+  mockHint: {
+    ...typography.bodySm,
+    color: colors.gray400,
+    marginLeft: spacing.xs,
   },
   filterRow: {
     flexDirection: 'row',

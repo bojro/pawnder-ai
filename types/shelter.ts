@@ -198,7 +198,10 @@ export interface ShelterPet {
   structuredNotes: string;       // <=400 chars
   idealAdopterNotes: string;     // <=400 chars
 
-  // Step 9 — Media & Assessment
+  // Step 9 — Visit Availability
+  availabilityGrid: Record<string, boolean>; // keyed "day-hour" e.g. "mon-9", "tue-14"
+
+  // Step 10 — Media & Assessment
   photoUris: string[];
   coverPhotoIndex: number;
   assessorRole: AssessorRole | null;
@@ -300,6 +303,9 @@ export const DEFAULT_PET_INTAKE_DRAFT: PetIntakeDraft = {
   idealAdopterNotes: '',
 
   // Step 9
+  availabilityGrid: {},
+
+  // Step 10
   photoUris: [],
   coverPhotoIndex: 0,
   assessorRole: null,

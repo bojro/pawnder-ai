@@ -1,22 +1,55 @@
-import apiClient from './api';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { db } from './firebase';
 import { mockAdopter } from './mockData';
 import { useAppStore } from '../store/useAppStore';
 import { Adopter } from '../types';
+import { DEFAULT_ONBOARDING_DRAFT } from '../types/adopter';
+
+function newAdopterDoc(uid: string): Adopter {
+  const now = new Date().toISOString();
+  return {
+    id: uid,
+    deviceId: uid,
+    ...DEFAULT_ONBOARDING_DRAFT,
+    housingType: 'apartment',
+    environment: 'suburban',
+    experienceLevel: 'beginner',
+    onboardingComplete: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
 
 export const authService = {
-  async createAdopter(deviceId: string): Promise<Adopter> {
+  /** Create a new adopter doc in Firestore keyed by Firebase Auth uid */
+  async createAdopter(uid: string): Promise<Adopter> {
     if (useAppStore.getState().mockMode) {
-      return { ...mockAdopter, deviceId, id: `adopter-${Date.now()}` };
+      return { ...mockAdopter, deviceId: uid, id: `adopter-${Date.now()}` };
     }
-    const response = await apiClient.post<Adopter>('/adopters', { deviceId });
-    return response.data;
+    const ref = doc(db, 'adopters', uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      return { id: uid, ...snap.data() } as Adopter;
+    }
+    const adopter = newAdopterDoc(uid);
+    const { id: _id, ...adopterData } = adopter;
+    await setDoc(ref, { ...adopterData, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    return adopter;
   },
 
-  async getAdopter(adopterId: string): Promise<Adopter> {
+  /** Fetch an existing adopter doc */
+  async getAdopter(uid: string): Promise<Adopter> {
     if (useAppStore.getState().mockMode) {
-      return { ...mockAdopter, id: adopterId };
+      return { ...mockAdopter, id: uid };
     }
-    const response = await apiClient.get<Adopter>(`/adopters/${adopterId}`);
-    return response.data;
+    const ref = doc(db, 'adopters', uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('Adopter not found');
+    return { id: uid, ...snap.data() } as Adopter;
   },
 };

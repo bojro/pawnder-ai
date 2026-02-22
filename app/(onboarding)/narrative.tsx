@@ -25,7 +25,7 @@ export default function OnboardingNarrative() {
       setAdopter(updatedAdopter);
       await saveAdopterId(updatedAdopter.id);
       router.replace('/(main)/swipe');
-    } catch (err) {
+    } catch (err: any) {
       Alert.alert('Error', 'Failed to save your profile. Please try again.');
     } finally {
       setSubmitting(false);

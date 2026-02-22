@@ -1,13 +1,24 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  query,
+  where,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { db, auth } from '../services/firebase';
+import { useAppStore } from './useAppStore';
+import {
   ShelterPet,
   PetIntakeDraft,
   DEFAULT_PET_INTAKE_DRAFT,
   PetStatus,
 } from '../types/shelter';
 
-const STORAGE_KEY = 'pawnder_shelter_pets';
 const DRAFT_STORAGE_KEY = 'pawnder_shelter_current_draft';
 
 // ─── Completion calculator ───
@@ -32,7 +43,7 @@ export function computeCompletion(draft: PetIntakeDraft): number {
   if (draft.spayNeuterStatus !== 'unknown') filled++;
   if (draft.groomingNeed !== 'low' || draft.mobilityLimit !== 'none') filled++;
 
-  // Step 3: Temperament Social (6 sliders — count as filled if any changed from default 3)
+  // Step 3: Temperament Social
   total += 1;
   const socialSliders = [
     draft.friendlinessAdults, draft.friendlinessKids,
@@ -67,7 +78,11 @@ export function computeCompletion(draft: PetIntakeDraft): number {
   if (draft.topStrengths.length > 0) filled++;
   if (draft.oneLineBlurb.trim()) filled++;
 
-  // Step 9: Media & Assessment
+  // Step 9: Visit Availability
+  total += 1;
+  if (Object.keys(draft.availabilityGrid || {}).length > 0) filled++;
+
+  // Step 10: Media & Assessment
   total += 2;
   if (draft.photoUris.length > 0) filled++;
   if (draft.assessorRole) filled++;
@@ -80,13 +95,11 @@ function generateId(): string {
 }
 
 interface ShelterState {
-  // Data
   shelterPets: ShelterPet[];
   currentDraft: PetIntakeDraft;
   currentEditId: string | null;
   isLoaded: boolean;
 
-  // Actions
   loadFromStorage: () => Promise<void>;
   updateDraft: (partial: Partial<PetIntakeDraft>) => void;
   resetDraft: () => void;
@@ -105,13 +118,32 @@ export const useShelterStore = create<ShelterState>((set, get) => ({
 
   loadFromStorage: async () => {
     try {
-      const petsJson = await AsyncStorage.getItem(STORAGE_KEY);
+      const isMock = useAppStore.getState().mockMode;
+
+      let pets: ShelterPet[] = [];
+
+      if (!isMock) {
+        // Load pets from Firestore if authenticated
+        const uid = auth.currentUser?.uid;
+        if (uid) {
+          const q = query(collection(db, 'shelterPets'), where('shelterId', '==', uid));
+          const snap = await getDocs(q);
+          snap.forEach((d) => {
+            pets.push({ id: d.id, ...d.data() } as ShelterPet);
+          });
+        }
+      }
+      // In mock mode, pets stay empty — dashboard will seed mock data if needed
+
+      // Load draft from AsyncStorage (local cache, works in both modes)
       const draftJson = await AsyncStorage.getItem(DRAFT_STORAGE_KEY);
-      const pets: ShelterPet[] = petsJson ? JSON.parse(petsJson) : [];
       const savedDraft = draftJson ? JSON.parse(draftJson) : null;
+
       set({
         shelterPets: pets,
-        currentDraft: savedDraft?.draft || { ...DEFAULT_PET_INTAKE_DRAFT },
+        currentDraft: savedDraft?.draft
+          ? { ...DEFAULT_PET_INTAKE_DRAFT, ...savedDraft.draft }
+          : { ...DEFAULT_PET_INTAKE_DRAFT },
         currentEditId: savedDraft?.editId || null,
         isLoaded: true,
       });
@@ -124,7 +156,7 @@ export const useShelterStore = create<ShelterState>((set, get) => ({
   updateDraft: (partial) => {
     const newDraft = { ...get().currentDraft, ...partial };
     set({ currentDraft: newDraft });
-    // Autosave to AsyncStorage
+    // Autosave draft to AsyncStorage (local cache only)
     AsyncStorage.setItem(
       DRAFT_STORAGE_KEY,
       JSON.stringify({ draft: newDraft, editId: get().currentEditId }),
@@ -145,7 +177,7 @@ export const useShelterStore = create<ShelterState>((set, get) => ({
     const pet = get().shelterPets.find(p => p.id === id);
     if (!pet) return;
     const { id: _id, completionPercent: _c, lastUpdated: _l, createdAt: _cr, ...draft } = pet;
-    set({ currentDraft: draft as PetIntakeDraft, currentEditId: id });
+    set({ currentDraft: { ...DEFAULT_PET_INTAKE_DRAFT, ...draft } as PetIntakeDraft, currentEditId: id });
     AsyncStorage.setItem(
       DRAFT_STORAGE_KEY,
       JSON.stringify({ draft, editId: id }),
@@ -156,38 +188,65 @@ export const useShelterStore = create<ShelterState>((set, get) => ({
     const { currentDraft, currentEditId, shelterPets } = get();
     const now = new Date().toISOString();
     const completion = computeCompletion(currentDraft);
-
-    let updatedPets: ShelterPet[];
+    const isMock = useAppStore.getState().mockMode;
+    const uid = auth.currentUser?.uid || 'unknown';
 
     if (currentEditId) {
-      // Update existing pet
-      updatedPets = shelterPets.map(p =>
+      // Update existing pet (local state)
+      const updatedPets = shelterPets.map(p =>
         p.id === currentEditId
           ? { ...p, ...currentDraft, completionPercent: completion, lastUpdated: now }
           : p,
       );
+      set({ shelterPets: updatedPets });
+
+      // Write to Firestore (only in live mode)
+      if (!isMock) {
+        const ref = doc(db, 'shelterPets', currentEditId);
+        await setDoc(ref, {
+          ...currentDraft,
+          shelterId: uid,
+          completionPercent: completion,
+          lastUpdated: serverTimestamp(),
+        }, { merge: true }).catch(console.error);
+      }
     } else {
-      // Create new pet
+      // Create new pet (local state)
+      const newId = generateId();
       const newPet: ShelterPet = {
-        id: generateId(),
+        id: newId,
         completionPercent: completion,
         lastUpdated: now,
         createdAt: now,
         ...currentDraft,
       };
-      updatedPets = [newPet, ...shelterPets];
-      set({ currentEditId: newPet.id });
+      const updatedPets = [newPet, ...shelterPets];
+      set({ shelterPets: updatedPets, currentEditId: newId });
+
+      // Write to Firestore (only in live mode)
+      if (!isMock) {
+        const ref = doc(db, 'shelterPets', newId);
+        await setDoc(ref, {
+          ...currentDraft,
+          shelterId: uid,
+          completionPercent: completion,
+          createdAt: serverTimestamp(),
+          lastUpdated: serverTimestamp(),
+        }).catch(console.error);
+      }
     }
 
-    set({ shelterPets: updatedPets });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPets));
+    // Clear draft cache
     await AsyncStorage.removeItem(DRAFT_STORAGE_KEY);
   },
 
   deletePet: async (id: string) => {
     const updatedPets = get().shelterPets.filter(p => p.id !== id);
     set({ shelterPets: updatedPets });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPets));
+    // Delete from Firestore (only in live mode)
+    if (!useAppStore.getState().mockMode) {
+      await deleteDoc(doc(db, 'shelterPets', id)).catch(console.error);
+    }
   },
 
   updatePetStatus: async (id: string, status: PetStatus) => {
@@ -196,6 +255,10 @@ export const useShelterStore = create<ShelterState>((set, get) => ({
       p.id === id ? { ...p, status, lastUpdated: now } : p,
     );
     set({ shelterPets: updatedPets });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPets));
+    // Update in Firestore (only in live mode)
+    if (!useAppStore.getState().mockMode) {
+      const ref = doc(db, 'shelterPets', id);
+      await setDoc(ref, { status, lastUpdated: serverTimestamp() }, { merge: true }).catch(console.error);
+    }
   },
 }));

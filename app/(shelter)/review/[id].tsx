@@ -13,6 +13,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../../../components/ui/Button';
 import StatusBadge from '../../../components/shelter/StatusBadge';
+import AvailabilityGrid from '../../../components/shelter/AvailabilityGrid';
 import { useShelterStore, computeCompletion } from '../../../store/useShelterStore';
 import { ShelterPet, PetStatus } from '../../../types/shelter';
 import {
@@ -88,6 +89,7 @@ export default function ReviewScreen() {
       '/(shelter)/(intake)/environment',
       '/(shelter)/(intake)/training-plan',
       '/(shelter)/(intake)/observations',
+      '/(shelter)/(intake)/availability',
       '/(shelter)/(intake)/media',
     ] as const;
     router.push(stepRoutes[step] as any);
@@ -202,8 +204,6 @@ export default function ReviewScreen() {
           <InfoRow label="Stairs OK" value={pet.stairsOk ? 'Yes' : 'No'} />
           <InfoRow label="Noise Tolerance" value={ratingLabel(pet.noiseTolerance)} />
           <InfoRow label="Single Pet Only" value={pet.singlePetOnly ? 'Yes' : 'No'} />
-          <InfoRow label="Dogs OK" value={pet.compatibleWithDogs ? 'Yes' : 'No'} />
-          <InfoRow label="Cats OK" value={pet.compatibleWithCats ? 'Yes' : 'No'} />
           <InfoRow label="Kids OK" value={pet.compatibleWithKids ? `Yes (min age ${pet.minimumKidAge})` : 'No'} />
           <InfoRow label="Experienced Owner" value={pet.needsExperiencedOwner ? 'Required' : 'Not required'} />
         </SectionCard>
@@ -228,8 +228,17 @@ export default function ReviewScreen() {
           {pet.idealAdopterNotes ? <LongText label="Ideal Adopter" text={pet.idealAdopterNotes} /> : null}
         </SectionCard>
 
-        {/* Section 9: Assessment */}
-        <SectionCard title="Media & Assessment" stepIndex={8} onEdit={handleEditSection}>
+        {/* Section 9: Visit Availability */}
+        <SectionCard title="Visit Availability" stepIndex={8} onEdit={handleEditSection}>
+          {pet.availabilityGrid && Object.keys(pet.availabilityGrid).length > 0 ? (
+            <AvailabilityGrid grid={pet.availabilityGrid} onChange={() => {}} readOnly />
+          ) : (
+            <Text style={sectionStyles.infoLabel}>No availability set</Text>
+          )}
+        </SectionCard>
+
+        {/* Section 10: Assessment */}
+        <SectionCard title="Media & Assessment" stepIndex={9} onEdit={handleEditSection}>
           <InfoRow label="Photos" value={`${pet.photoUris.length} uploaded`} />
           <InfoRow label="Assessor" value={getLabel(ASSESSOR_ROLE_OPTIONS, pet.assessorRole)} />
           <InfoRow label="Method" value={getLabel(ASSESSMENT_METHOD_OPTIONS, pet.assessmentMethod)} />

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StabilityScoreRing from '../../../components/StabilityScoreRing';
@@ -12,7 +12,7 @@ import { colors, typography, spacing, radii, shadows } from '../../../utils/them
 import { formatDaysRemaining, formatScore, getStabilityColor } from '../../../utils/formatters';
 
 export default function FosterDashboard() {
-  const { activeMatch, fetchActiveMatch } = useActiveMatch();
+  const { activeMatch, fetchActiveMatch, cancelMatch } = useActiveMatch();
   const { stabilitySummary, fetchStability } = useStabilityScore();
 
   useEffect(() => {
@@ -25,6 +25,7 @@ export default function FosterDashboard() {
     }
   }, [activeMatch?.id]);
 
+  /* ---------- No active match ---------- */
   if (!activeMatch) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
@@ -41,8 +42,89 @@ export default function FosterDashboard() {
     );
   }
 
+  /* ---------- Visit Pending (status === 'confirmed') ---------- */
+  if (activeMatch.status === 'confirmed') {
+    const handleEndMatch = () => {
+      Alert.alert(
+        'Cancel this match?',
+        `This will end your match with ${activeMatch.pet.name} and return you to browsing.`,
+        [
+          { text: 'Keep Match', style: 'cancel' },
+          {
+            text: 'End Match',
+            style: 'destructive',
+            onPress: async () => {
+              await cancelMatch();
+              router.replace('/(main)/swipe');
+            },
+          },
+        ],
+      );
+    };
+
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.pendingContainer}>
+          <View style={styles.pendingCircle}>
+            <Text style={styles.pendingEmoji}>📅</Text>
+          </View>
+          <Text style={styles.pendingTitle}>Visit Scheduled</Text>
+          <Text style={styles.pendingSubtitle}>
+            You're matched with{' '}
+            <Text style={styles.bold}>{activeMatch.pet.name}</Text>.{'\n'}
+            After your visit, let us know how it went!
+          </Text>
+
+          <View style={[styles.pendingCard, shadows.subtle]}>
+            <Text style={styles.pendingCardTitle}>Next steps</Text>
+            <Text style={styles.pendingCardItem}>
+              1. Attend your scheduled visit
+            </Text>
+            <Text style={styles.pendingCardItem}>
+              2. Come back here and tell us how it went
+            </Text>
+            <Text style={styles.pendingCardItem}>
+              3. If it goes well, begin the foster journey!
+            </Text>
+          </View>
+
+          <View style={styles.pendingActions}>
+            <Button
+              title="How did it go?"
+              onPress={() => router.push('/(main)/foster/visit-outcome')}
+            />
+            <Button
+              title="Cancel Match"
+              variant="ghost"
+              onPress={handleEndMatch}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  /* ---------- Active Foster (status === 'in_foster') ---------- */
   const score = stabilitySummary?.stabilityScore ?? activeMatch.stabilityScore;
   const daysText = formatDaysRemaining(activeMatch.stabilizationEndDate);
+
+  const handleEndFoster = () => {
+    Alert.alert(
+      'End foster?',
+      `Are you sure you want to end your foster with ${activeMatch.pet.name}? This will cancel the match and return you to browsing.`,
+      [
+        { text: 'Keep Fostering', style: 'cancel' },
+        {
+          text: 'End Foster',
+          style: 'destructive',
+          onPress: async () => {
+            await cancelMatch();
+            router.replace('/(main)/swipe');
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -97,6 +179,11 @@ export default function FosterDashboard() {
               })
             }
           />
+          <Button
+            title="End Foster"
+            variant="ghost"
+            onPress={handleEndFoster}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -137,6 +224,8 @@ const styles = StyleSheet.create({
   actions: {
     gap: spacing.md,
   },
+
+  /* ---------- Empty state ---------- */
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -163,5 +252,62 @@ const styles = StyleSheet.create({
     ...typography.bodyMd,
     color: colors.gray600,
     textAlign: 'center',
+  },
+
+  /* ---------- Visit Pending state ---------- */
+  pendingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.screenPadding,
+  },
+  pendingCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.goldenLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  pendingEmoji: {
+    fontSize: 48,
+  },
+  pendingTitle: {
+    ...typography.displayMd,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  pendingSubtitle: {
+    ...typography.bodyMd,
+    color: colors.gray600,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+    lineHeight: 22,
+  },
+  bold: {
+    fontFamily: typography.labelMd.fontFamily,
+    color: colors.teal,
+  },
+  pendingCard: {
+    backgroundColor: colors.white,
+    borderRadius: radii.card,
+    padding: spacing.cardPadding,
+    width: '100%',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  pendingCardTitle: {
+    ...typography.labelMd,
+    marginBottom: spacing.xs,
+  },
+  pendingCardItem: {
+    ...typography.bodyMd,
+    color: colors.gray600,
+    lineHeight: 22,
+  },
+  pendingActions: {
+    width: '100%',
+    gap: spacing.md,
   },
 });

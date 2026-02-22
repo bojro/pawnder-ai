@@ -24,7 +24,7 @@ import {
 } from '../types/shelter';
 
 // ─── Step count ───
-export const TOTAL_INTAKE_STEPS = 9;
+export const TOTAL_INTAKE_STEPS = 10;
 
 export const INTAKE_STEP_NAMES = [
   'basic-profile',
@@ -35,8 +35,13 @@ export const INTAKE_STEP_NAMES = [
   'environment',
   'training-plan',
   'observations',
+  'availability',
   'media',
 ] as const;
+
+// ─── Step 9: Visit Availability (When2Meet grid) ───
+export const AVAILABILITY_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
+export const AVAILABILITY_HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17] as const;
 
 // ─── Step 1: Basic Profile ───
 export const SPECIES_OPTIONS: { label: string; value: Species }[] = [
@@ -254,7 +259,7 @@ export const CHALLENGE_OPTIONS: { label: string; value: PetChallenge }[] = [
   { label: 'Medical Needs', value: 'medical_needs' },
 ];
 
-// ─── Step 9: Assessment Provenance ───
+// ─── Step 10: Assessment Provenance ───
 export const ASSESSOR_ROLE_OPTIONS: { label: string; value: AssessorRole }[] = [
   { label: 'Shelter Staff', value: 'shelter_staff' },
   { label: 'Foster Parent', value: 'foster_parent' },

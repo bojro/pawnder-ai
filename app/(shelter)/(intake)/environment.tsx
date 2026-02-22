@@ -90,22 +90,6 @@ export default function IntakeEnvironment() {
           />
         </View>
 
-        {/* Compatibility toggles */}
-        <Text style={styles.sectionLabel}>Compatibility</Text>
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Compatible with Dogs</Text>
-          <ToggleSwitch
-            value={currentDraft.compatibleWithDogs}
-            onToggle={() => updateDraft({ compatibleWithDogs: !currentDraft.compatibleWithDogs })}
-          />
-        </View>
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Compatible with Cats</Text>
-          <ToggleSwitch
-            value={currentDraft.compatibleWithCats}
-            onToggle={() => updateDraft({ compatibleWithCats: !currentDraft.compatibleWithCats })}
-          />
-        </View>
         <View style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>Compatible with Kids</Text>
           <ToggleSwitch

@@ -33,7 +33,7 @@ export default function IntakeMedia() {
     <IntakeStep
       title="Media & Assessment"
       subtitle="Add photos and record who assessed this pet."
-      currentStep={8}
+      currentStep={9}
       totalSteps={TOTAL_INTAKE_STEPS}
       onNext={handleFinish}
       nextLabel="Save & Finish"

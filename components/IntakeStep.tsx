@@ -28,6 +28,9 @@ interface IntakeStepProps {
   nextDisabled?: boolean;
   loading?: boolean;
   showBack?: boolean;
+  onBack?: () => void;
+  backLabel?: string;
+  scrollEnabled?: boolean;
 }
 
 export default function IntakeStep({
@@ -41,7 +44,12 @@ export default function IntakeStep({
   nextDisabled = false,
   loading = false,
   showBack = true,
+  onBack,
+  backLabel,
+  scrollEnabled = true,
 }: IntakeStepProps) {
+  const showBackButton = showBack && (currentStep > 0 || !!onBack);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
@@ -51,9 +59,13 @@ export default function IntakeStep({
       >
         {/* Header row with back button and autosave indicator */}
         <View style={styles.headerRow}>
-          {showBack && currentStep > 0 ? (
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          {showBackButton ? (
+            <TouchableOpacity
+              onPress={onBack || (() => router.back())}
+              style={styles.backButton}
+            >
               <Ionicons name="chevron-back" size={24} color={colors.charcoal} />
+              {backLabel ? <Text style={styles.backLabel}>{backLabel}</Text> : null}
             </TouchableOpacity>
           ) : (
             <View style={styles.backPlaceholder} />
@@ -80,6 +92,7 @@ export default function IntakeStep({
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
+          scrollEnabled={scrollEnabled}
         >
           {children}
         </ScrollView>
@@ -113,7 +126,14 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: spacing.xs,
+  },
+  backLabel: {
+    ...typography.bodySm,
+    color: colors.charcoal,
+    marginLeft: 2,
   },
   backPlaceholder: {
     width: 32,

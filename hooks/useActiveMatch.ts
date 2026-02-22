@@ -38,11 +38,50 @@ export function useActiveMatch() {
     [adopterId, setActiveMatch, setLoading, setError]
   );
 
+  /**
+   * Cancel / end the current active match and clear it from the store.
+   */
+  const cancelMatch = useCallback(async () => {
+    if (!activeMatch) return;
+    try {
+      setLoading(true);
+      await matchService.cancelMatch(activeMatch.id);
+      setActiveMatch(null);
+    } catch {
+      setError('Failed to cancel match');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeMatch, setActiveMatch, setLoading, setError]);
+
+  /**
+   * Transition the current match from 'confirmed' → 'in_foster' after a
+   * successful first visit, then re-fetch the full active match so the
+   * foster dashboard renders the complete view.
+   */
+  const advanceToFoster = useCallback(async () => {
+    if (!activeMatch || !adopterId) return;
+    try {
+      setLoading(true);
+      await matchService.updateMatchStatus(activeMatch.id, 'in_foster');
+      // Re-fetch so the store has the updated status
+      const refreshed = await matchService.getActiveMatch(adopterId);
+      setActiveMatch(refreshed);
+    } catch {
+      setError('Failed to update match status');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeMatch, adopterId, setActiveMatch, setLoading, setError]);
+
   return {
     activeMatch,
-    hasActiveMatch: activeMatch !== null &&
+    hasActiveMatch:
+      activeMatch !== null &&
       (activeMatch.status === 'confirmed' || activeMatch.status === 'in_foster'),
     fetchActiveMatch,
     confirmMatch,
+    cancelMatch,
+    advanceToFoster,
   };
 }

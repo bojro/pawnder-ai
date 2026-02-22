@@ -7,6 +7,7 @@ import ToggleSwitch from '../../components/ui/ToggleSwitch';
 import Button from '../../components/ui/Button';
 import { useAppStore } from '../../store/useAppStore';
 import { useMockMode } from '../../hooks/useMockMode';
+import { useAuth } from '../../hooks/useAuth';
 import { clearAll } from '../../utils/storage';
 import { capitalizeFirst } from '../../utils/formatters';
 import { colors, typography, spacing, radii, shadows } from '../../utils/theme';
@@ -24,18 +25,53 @@ function formatHousingType(type: string): string {
 
 export default function ProfileScreen() {
   const adopter = useAppStore((s) => s.adopter);
-  const reset = useAppStore((s) => s.reset);
+  const updateOnboardingDraft = useAppStore((s) => s.updateOnboardingDraft);
   const { mockMode, toggleMockMode } = useMockMode();
+  const { logout } = useAuth();
+
+  const handleEditProfile = () => {
+    if (!adopter) return;
+    // Pre-fill onboarding draft with current adopter data
+    updateOnboardingDraft({
+      name: adopter.name,
+      age: adopter.age,
+      phone: adopter.phone,
+      email: adopter.email,
+      zipCode: adopter.zipCode,
+      searchRadius: adopter.searchRadius,
+      housingType: adopter.housingType,
+      environment: adopter.environment,
+      householdSize: adopter.householdSize,
+      kidsCount: adopter.kidsCount,
+      kidsAges: adopter.kidsAges,
+      hoursAwayPerDay: adopter.hoursAwayPerDay,
+      activityHoursPerWeek: adopter.activityHoursPerWeek,
+      experienceLevel: adopter.experienceLevel,
+      existingPetTypes: adopter.existingPetTypes,
+      allergies: adopter.allergies,
+      willingGroupClasses: adopter.willingGroupClasses,
+      willingPrivateTrainer: adopter.willingPrivateTrainer,
+      willingDailyExercises: adopter.willingDailyExercises,
+      trainingHoursPerWeek: adopter.trainingHoursPerWeek,
+      barkingTolerance: adopter.barkingTolerance,
+      sheddingTolerance: adopter.sheddingTolerance,
+      trainingCommitment: adopter.trainingCommitment,
+      specialNeedsWilling: adopter.specialNeedsWilling,
+      narrative1: adopter.narrative1,
+      narrative2: adopter.narrative2,
+    });
+    router.push('/(onboarding)');
+  };
 
   const handleLogout = () => {
-    Alert.alert('Log Out', 'Are you sure? Your data will be cleared.', [
+    Alert.alert('Log Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Log Out',
         style: 'destructive',
         onPress: async () => {
           await clearAll();
-          reset();
+          await logout();
           router.replace('/(auth)/login');
         },
       },
@@ -186,6 +222,8 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        <Button title="Edit Profile" variant="ghost" onPress={handleEditProfile} />
+        <View style={{ height: spacing.sm }} />
         <Button title="Log Out" variant="secondary" onPress={handleLogout} />
       </ScrollView>
     </SafeAreaView>

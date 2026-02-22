@@ -25,10 +25,24 @@ import {
 } from '../../../types/shelter';
 import { colors, typography, spacing } from '../../../utils/theme';
 
+function getSizeFromWeight(lbs: number): SizeCategory | null {
+  if (lbs <= 0) return null;
+  if (lbs < 5) return 'tiny';
+  if (lbs < 25) return 'small';
+  if (lbs < 50) return 'medium';
+  if (lbs < 100) return 'large';
+  return 'extra_large';
+}
+
 export default function IntakeBasicProfile() {
-  const { currentDraft, updateDraft } = useShelterStore();
+  const { currentDraft, updateDraft, saveDraft } = useShelterStore();
 
   const canContinue = currentDraft.name.trim().length > 0 && currentDraft.species !== null;
+
+  const handleSaveAndExit = async () => {
+    await saveDraft();
+    router.replace('/(shelter)/dashboard');
+  };
 
   return (
     <IntakeStep
@@ -38,7 +52,9 @@ export default function IntakeBasicProfile() {
       totalSteps={TOTAL_INTAKE_STEPS}
       onNext={() => router.push('/(shelter)/(intake)/health')}
       nextDisabled={!canContinue}
-      showBack={false}
+      showBack={true}
+      onBack={handleSaveAndExit}
+      backLabel="Save & Exit"
     >
       <View style={styles.content}>
         <TextInput
@@ -125,7 +141,11 @@ export default function IntakeBasicProfile() {
               label="Weight (lbs)"
               placeholder="0"
               value={currentDraft.weightLbs === 0 ? '' : currentDraft.weightLbs.toString()}
-              onChangeText={(text) => updateDraft({ weightLbs: text === '' ? 0 : parseInt(text) || 0 })}
+              onChangeText={(text) => {
+                const w = text === '' ? 0 : parseInt(text) || 0;
+                const autoSize = getSizeFromWeight(w);
+                updateDraft({ weightLbs: w, ...(autoSize ? { sizeCategory: autoSize } : {}) });
+              }}
               keyboardType="number-pad"
               maxLength={3}
             />

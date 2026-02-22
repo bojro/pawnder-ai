@@ -67,6 +67,14 @@ export async function saveUserRole(role: UserRole): Promise<void> {
   }
 }
 
+export async function clearUserRole(): Promise<void> {
+  try {
+    await SecureStore.deleteItemAsync(KEYS.USER_ROLE);
+  } catch (error) {
+    console.error('Failed to clear user role:', error);
+  }
+}
+
 export function generateDeviceId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;

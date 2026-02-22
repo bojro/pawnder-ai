@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import OnboardingStep from '../../components/OnboardingStep';
 import TextInput from '../../components/ui/TextInput';
 import { useAppStore } from '../../store/useAppStore';
+import { auth } from '../../services/firebase';
 import { TOTAL_ONBOARDING_STEPS } from '../../utils/constants';
 import { spacing } from '../../utils/theme';
 
 export default function OnboardingProfile() {
   const { onboardingDraft, updateOnboardingDraft } = useAppStore();
+
+  // Auto-populate email from Firebase Auth if not already filled
+  useEffect(() => {
+    if (!onboardingDraft.email && auth.currentUser?.email) {
+      updateOnboardingDraft({ email: auth.currentUser.email });
+    }
+  }, []);
 
   const canContinue =
     onboardingDraft.name.trim().length >= 2 &&

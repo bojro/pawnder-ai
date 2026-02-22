@@ -1,4 +1,5 @@
-import apiClient from './api';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase';
 import { useAppStore } from '../store/useAppStore';
 import { Swipe, SwipeDirection, SwipeReason } from '../types';
 
@@ -7,7 +8,7 @@ export const swipeService = {
     adopterId: string,
     petId: string,
     direction: SwipeDirection,
-    reason?: SwipeReason
+    reason?: SwipeReason,
   ): Promise<Swipe> {
     if (useAppStore.getState().mockMode) {
       return {
@@ -19,12 +20,20 @@ export const swipeService = {
         createdAt: new Date().toISOString(),
       };
     }
-    const response = await apiClient.post<Swipe>('/swipes', {
+    const ref = await addDoc(collection(db, 'swipes'), {
+      adopterId,
+      petId,
+      direction,
+      reason: reason || null,
+      createdAt: serverTimestamp(),
+    });
+    return {
+      id: ref.id,
       adopterId,
       petId,
       direction,
       reason,
-    });
-    return response.data;
+      createdAt: new Date().toISOString(),
+    };
   },
 };

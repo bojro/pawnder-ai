@@ -1,4 +1,5 @@
-import apiClient from './api';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase';
 import { useAppStore } from '../store/useAppStore';
 import { DailyCheckIn, WeeklyCheckIn, DayRating } from '../types';
 
@@ -6,7 +7,7 @@ export const checkinService = {
   async submitDailyCheckIn(
     matchId: string,
     adopterId: string,
-    data: { dayRating: DayRating; stressSignals: boolean; notes?: string }
+    data: { dayRating: DayRating; stressSignals: boolean; notes?: string },
   ): Promise<DailyCheckIn> {
     if (useAppStore.getState().mockMode) {
       return {
@@ -17,12 +18,20 @@ export const checkinService = {
         createdAt: new Date().toISOString(),
       };
     }
-    const response = await apiClient.post<DailyCheckIn>('/checkins/daily', {
+    const ref = await addDoc(collection(db, 'checkins'), {
+      matchId,
+      adopterId,
+      type: 'daily',
+      ...data,
+      createdAt: serverTimestamp(),
+    });
+    return {
+      id: ref.id,
       matchId,
       adopterId,
       ...data,
-    });
-    return response.data;
+      createdAt: new Date().toISOString(),
+    };
   },
 
   async submitWeeklyCheckIn(
@@ -35,7 +44,7 @@ export const checkinService = {
       exerciseAdequacy: boolean;
       bond: 1 | 2 | 3 | 4 | 5;
       notes?: string;
-    }
+    },
   ): Promise<WeeklyCheckIn> {
     if (useAppStore.getState().mockMode) {
       return {
@@ -46,11 +55,19 @@ export const checkinService = {
         createdAt: new Date().toISOString(),
       };
     }
-    const response = await apiClient.post<WeeklyCheckIn>('/checkins/weekly', {
+    const ref = await addDoc(collection(db, 'checkins'), {
+      matchId,
+      adopterId,
+      type: 'weekly',
+      ...data,
+      createdAt: serverTimestamp(),
+    });
+    return {
+      id: ref.id,
       matchId,
       adopterId,
       ...data,
-    });
-    return response.data;
+      createdAt: new Date().toISOString(),
+    };
   },
 };
