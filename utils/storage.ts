@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 const KEYS = {
   DEVICE_ID: 'pawnder_device_id',
   ADOPTER_ID: 'pawnder_adopter_id',
+  USER_ROLE: 'pawnder_user_role',
 } as const;
 
 export async function getDeviceId(): Promise<string | null> {
@@ -41,8 +42,28 @@ export async function clearAll(): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(KEYS.DEVICE_ID);
     await SecureStore.deleteItemAsync(KEYS.ADOPTER_ID);
+    await SecureStore.deleteItemAsync(KEYS.USER_ROLE);
   } catch (error) {
     console.error('Failed to clear secure store:', error);
+  }
+}
+
+export type UserRole = 'adopter' | 'shelter';
+
+export async function getUserRole(): Promise<UserRole | null> {
+  try {
+    const role = await SecureStore.getItemAsync(KEYS.USER_ROLE);
+    return role as UserRole | null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveUserRole(role: UserRole): Promise<void> {
+  try {
+    await SecureStore.setItemAsync(KEYS.USER_ROLE, role);
+  } catch (error) {
+    console.error('Failed to save user role:', error);
   }
 }
 

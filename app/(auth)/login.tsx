@@ -1,19 +1,27 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/ui/Button';
+import SelectionChip from '../../components/ui/SelectionChip';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppStore } from '../../store/useAppStore';
+import { saveUserRole, UserRole } from '../../utils/storage';
 import { colors, typography, spacing } from '../../utils/theme';
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const isLoading = useAppStore((s) => s.isLoading);
+  const [role, setRole] = useState<UserRole>('adopter');
 
   const handleContinue = async () => {
-    await login();
-    router.replace('/(onboarding)');
+    await saveUserRole(role);
+    if (role === 'shelter') {
+      router.replace('/(shelter)/dashboard');
+    } else {
+      await login();
+      router.replace('/(onboarding)');
+    }
   };
 
   return (
@@ -30,6 +38,25 @@ export default function LoginScreen() {
         <View style={styles.illustrationContainer}>
           <View style={styles.illustrationPlaceholder}>
             <Text style={styles.pawEmoji}>🐾</Text>
+          </View>
+        </View>
+
+        {/* Role toggle */}
+        <View style={styles.roleSection}>
+          <Text style={styles.roleLabel}>I am a...</Text>
+          <View style={styles.roleRow}>
+            <SelectionChip
+              label="🏠  Adopter"
+              selected={role === 'adopter'}
+              onPress={() => setRole('adopter')}
+              style={styles.roleChip}
+            />
+            <SelectionChip
+              label="🏥  Shelter"
+              selected={role === 'shelter'}
+              onPress={() => setRole('shelter')}
+              style={styles.roleChip}
+            />
           </View>
         </View>
 
@@ -83,15 +110,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   illustrationPlaceholder: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     backgroundColor: colors.tealLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
   pawEmoji: {
-    fontSize: 80,
+    fontSize: 72,
+  },
+  roleSection: {
+    marginBottom: spacing.lg,
+  },
+  roleLabel: {
+    ...typography.labelMd,
+    color: colors.charcoal,
+    marginBottom: spacing.md,
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  roleChip: {
+    flex: 1,
   },
   footer: {
     paddingBottom: spacing.xl,

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
+import { getUserRole } from '../utils/storage';
 import { colors } from '../utils/theme';
 
 export default function Index() {
@@ -10,13 +11,24 @@ export default function Index() {
   useEffect(() => {
     if (!isReady) return;
 
-    if (!isAuthenticated || !adopter) {
-      router.replace('/(auth)/login');
-    } else if (!adopter.onboardingComplete) {
-      router.replace('/(onboarding)');
-    } else {
-      router.replace('/(main)/swipe');
-    }
+    const checkRoute = async () => {
+      const role = await getUserRole();
+
+      if (role === 'shelter') {
+        router.replace('/(shelter)/dashboard');
+        return;
+      }
+
+      if (!isAuthenticated || !adopter) {
+        router.replace('/(auth)/login');
+      } else if (!adopter.onboardingComplete) {
+        router.replace('/(onboarding)');
+      } else {
+        router.replace('/(main)/swipe');
+      }
+    };
+
+    checkRoute();
   }, [isReady, isAuthenticated, adopter]);
 
   return (

@@ -6,3 +6,4 @@ export * from './visit';
 export * from './checkin';
 export * from './training';
 export * from './api';
+export * from './shelter';
