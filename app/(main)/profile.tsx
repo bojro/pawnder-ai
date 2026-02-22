@@ -11,6 +11,17 @@ import { clearAll } from '../../utils/storage';
 import { capitalizeFirst } from '../../utils/formatters';
 import { colors, typography, spacing, radii, shadows } from '../../utils/theme';
 
+function formatHousingType(type: string): string {
+  switch (type) {
+    case 'unhoused': return 'Unhoused';
+    case 'apartment': return 'Apartment';
+    case 'house_small': return 'Small House';
+    case 'house_medium': return 'Medium House';
+    case 'house_large': return 'Large House';
+    default: return capitalizeFirst(type);
+  }
+}
+
 export default function ProfileScreen() {
   const adopter = useAppStore((s) => s.adopter);
   const reset = useAppStore((s) => s.reset);
@@ -36,20 +47,69 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Profile</Text>
 
+        {/* Personal Info */}
         <View style={[styles.card, shadows.card]}>
-          <Text style={styles.cardTitle}>About You</Text>
+          <Text style={styles.cardTitle}>Personal Info</Text>
+          {adopter && (
+            <>
+              <InfoRow
+                icon="person-outline"
+                label="Name"
+                value={adopter.name || '—'}
+              />
+              <InfoRow
+                icon="calendar-outline"
+                label="Age"
+                value={adopter.age ? `${adopter.age} yrs` : '—'}
+              />
+              <InfoRow
+                icon="call-outline"
+                label="Phone"
+                value={adopter.phone || '—'}
+              />
+              <InfoRow
+                icon="mail-outline"
+                label="Email"
+                value={adopter.email || '—'}
+              />
+            </>
+          )}
+        </View>
+
+        {/* Living Situation */}
+        <View style={[styles.card, shadows.card]}>
+          <Text style={styles.cardTitle}>Living Situation</Text>
           {adopter && (
             <>
               <InfoRow
                 icon="location-outline"
                 label="Location"
-                value={`${adopter.zipCode} (${adopter.searchRadius}mi radius)`}
+                value={`${adopter.zipCode} (${adopter.searchRadius}mi)`}
               />
               <InfoRow
                 icon="home-outline"
                 label="Housing"
-                value={capitalizeFirst(adopter.housingType)}
+                value={formatHousingType(adopter.housingType)}
               />
+              <InfoRow
+                icon="map-outline"
+                label="Environment"
+                value={capitalizeFirst(adopter.environment || '—')}
+              />
+              <InfoRow
+                icon="people-outline"
+                label="Household"
+                value={`${adopter.householdSize} people, ${adopter.kidsCount} kids`}
+              />
+            </>
+          )}
+        </View>
+
+        {/* Lifestyle & Experience */}
+        <View style={[styles.card, shadows.card]}>
+          <Text style={styles.cardTitle}>Lifestyle & Experience</Text>
+          {adopter && (
+            <>
               <InfoRow
                 icon="time-outline"
                 label="Hours Away"
@@ -57,8 +117,8 @@ export default function ProfileScreen() {
               />
               <InfoRow
                 icon="fitness-outline"
-                label="Activity Level"
-                value={`${adopter.activityLevel}/5`}
+                label="Activity"
+                value={`${adopter.activityHoursPerWeek}h/week`}
               />
               <InfoRow
                 icon="school-outline"
@@ -66,19 +126,53 @@ export default function ProfileScreen() {
                 value={capitalizeFirst(adopter.experienceLevel)}
               />
               <InfoRow
-                icon="people-outline"
-                label="Kids"
-                value={adopter.hasKids ? 'Yes' : 'No'}
+                icon="paw-outline"
+                label="Current Pets"
+                value={
+                  adopter.existingPetTypes.length > 0
+                    ? adopter.existingPetTypes.map(capitalizeFirst).join(', ')
+                    : 'None'
+                }
               />
               <InfoRow
-                icon="paw-outline"
-                label="Other Pets"
-                value={adopter.hasExistingPets ? 'Yes' : 'No'}
+                icon="medkit-outline"
+                label="Allergies"
+                value={adopter.allergies || 'None'}
               />
             </>
           )}
         </View>
 
+        {/* Training */}
+        <View style={[styles.card, shadows.card]}>
+          <Text style={styles.cardTitle}>Training Willingness</Text>
+          {adopter && (
+            <>
+              <InfoRow
+                icon="people-circle-outline"
+                label="Group Classes"
+                value={adopter.willingGroupClasses ? 'Yes' : 'No'}
+              />
+              <InfoRow
+                icon="person-circle-outline"
+                label="Private Trainer"
+                value={adopter.willingPrivateTrainer ? 'Yes' : 'No'}
+              />
+              <InfoRow
+                icon="barbell-outline"
+                label="Daily Exercises"
+                value={adopter.willingDailyExercises ? 'Yes' : 'No'}
+              />
+              <InfoRow
+                icon="timer-outline"
+                label="Training Time"
+                value={`${adopter.trainingHoursPerWeek}h/week`}
+              />
+            </>
+          )}
+        </View>
+
+        {/* Developer */}
         <View style={[styles.card, shadows.card]}>
           <Text style={styles.cardTitle}>Developer</Text>
           <View style={styles.settingRow}>
@@ -157,6 +251,8 @@ const styles = StyleSheet.create({
   infoValue: {
     ...typography.labelMd,
     color: colors.charcoal,
+    maxWidth: '50%',
+    textAlign: 'right',
   },
   settingRow: {
     flexDirection: 'row',

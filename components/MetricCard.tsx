@@ -13,7 +13,7 @@ export default function MetricCard({
   label,
   value,
   subtitle,
-  color = colors.plum,
+  color = colors.teal,
 }: MetricCardProps) {
   return (
     <View style={styles.card}>

@@ -14,11 +14,12 @@ export default function MainLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.white,
+        tabBarActiveTintColor: colors.teal,
         tabBarInactiveTintColor: colors.gray400,
         tabBarStyle: {
-          backgroundColor: colors.charcoal,
-          borderTopWidth: 0,
+          backgroundColor: colors.white,
+          borderTopWidth: 1,
+          borderTopColor: colors.gray200,
           height: sizes.tabBarHeight,
           paddingBottom: 8,
           paddingTop: 8,

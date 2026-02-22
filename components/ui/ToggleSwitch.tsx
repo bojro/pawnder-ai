@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   trackActive: {
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
   },
   trackInactive: {
     backgroundColor: colors.gray200,

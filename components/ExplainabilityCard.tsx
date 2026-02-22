@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
   },
   matchBorder: {
-    borderLeftColor: colors.plumLight,
+    borderLeftColor: colors.tealLight,
   },
   challengeBorder: {
     borderLeftColor: colors.gray200,

@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   selected: {
-    backgroundColor: colors.plumLight,
-    borderColor: colors.plum,
+    backgroundColor: colors.tealLight,
+    borderColor: colors.teal,
   },
   disabled: {
     opacity: 0.4,
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
   },
   selectedLabel: {
-    color: colors.plum,
+    color: colors.teal,
     fontFamily: typography.labelMd.fontFamily,
   },
 });

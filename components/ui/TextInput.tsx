@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     color: colors.charcoal,
   },
   focused: {
-    borderBottomColor: colors.plum,
+    borderBottomColor: colors.teal,
   },
   error: {
     borderBottomColor: colors.red,

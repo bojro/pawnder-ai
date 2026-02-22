@@ -55,8 +55,8 @@ export default function WeeklyCheckInScreen() {
           <TextInput
             label="Number of incidents this week"
             placeholder="0"
-            value={incidentCount.toString()}
-            onChangeText={(text) => setIncidentCount(parseInt(text) || 0)}
+            value={incidentCount === 0 ? '' : incidentCount.toString()}
+            onChangeText={(text) => setIncidentCount(text === '' ? 0 : parseInt(text) || 0)}
             keyboardType="number-pad"
           />
         </View>

@@ -46,7 +46,7 @@ export default function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? colors.white : colors.plum} size="small" />
+        <ActivityIndicator color={isPrimary ? colors.white : colors.teal} size="small" />
       ) : (
         <Text
           style={[
@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   primary: {
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
   },
   secondary: {
     backgroundColor: colors.transparent,
     borderWidth: 1.5,
-    borderColor: colors.plum,
+    borderColor: colors.teal,
   },
   ghost: {
     backgroundColor: colors.transparent,
@@ -96,9 +96,9 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   secondaryText: {
-    color: colors.plum,
+    color: colors.teal,
   },
   ghostText: {
-    color: colors.plum,
+    color: colors.teal,
   },
 });

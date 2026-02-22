@@ -1,5 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProgressDots from './ui/ProgressDots';
 import Button from './ui/Button';
@@ -33,13 +42,24 @@ export default function OnboardingStep({
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ProgressDots total={totalSteps} current={currentStep} />
-        <View style={styles.content}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-          <View style={styles.childrenContainer}>{children}</View>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.headerArea}>
+            <Text style={styles.title}>{title}</Text>
+            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          </View>
+        </TouchableWithoutFeedback>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
         <View style={styles.footer}>
           <Button
             title={nextLabel}
@@ -62,9 +82,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.screenPadding,
   },
-  content: {
-    flex: 1,
-    paddingTop: spacing.xl,
+  headerArea: {
+    paddingTop: spacing.lg,
   },
   title: {
     ...typography.displayMd,
@@ -73,13 +92,17 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.bodyMd,
     color: colors.gray600,
-    marginBottom: spacing.xxxl,
+    marginBottom: spacing.md,
   },
-  childrenContainer: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   footer: {
     paddingBottom: spacing.lg,
+    paddingTop: spacing.sm,
   },
 });

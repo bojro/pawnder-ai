@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   completion: {
     ...typography.labelSm,
-    color: colors.plum,
+    color: colors.teal,
   },
   progressBarContainer: {
     height: 6,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
     borderRadius: 3,
   },
   weekContainer: {
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   upsellCard: {
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.goldenLight,
     borderRadius: radii.card,
     padding: spacing.cardPadding,
     marginTop: spacing.xl,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   upsellTitle: {
     ...typography.displaySm,
-    color: colors.plum,
+    color: colors.golden,
   },
   upsellBody: {
     ...typography.bodyMd,

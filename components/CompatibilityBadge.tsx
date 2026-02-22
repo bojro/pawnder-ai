@@ -36,7 +36,7 @@ export default function CompatibilityBadge({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.plum,
+    backgroundColor: colors.golden,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',

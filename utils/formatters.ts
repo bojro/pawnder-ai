@@ -30,8 +30,8 @@ export function formatDaysRemaining(endDate: string): string {
 }
 
 export function getStabilityColor(score: number): string {
-  if (score >= 70) return '#4CAF50';
-  if (score >= 40) return '#FF9800';
+  if (score >= 70) return '#4CAF7A';
+  if (score >= 40) return '#E6B566';
   return '#D32F2F';
 }
 

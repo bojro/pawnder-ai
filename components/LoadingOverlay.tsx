@@ -10,7 +10,7 @@ export default function LoadingOverlay({ visible }: LoadingOverlayProps) {
   if (!visible) return null;
   return (
     <View style={styles.overlay}>
-      <ActivityIndicator size="large" color={colors.plum} />
+      <ActivityIndicator size="large" color={colors.teal} />
     </View>
   );
 }
@@ -18,7 +18,7 @@ export default function LoadingOverlay({ visible }: LoadingOverlayProps) {
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(250, 248, 246, 0.8)',
+    backgroundColor: 'rgba(247, 249, 248, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 999,

@@ -7,7 +7,7 @@ export default function VisitLayout() {
       screenOptions={{
         headerShown: true,
         headerTitle: 'Schedule Visit',
-        headerTintColor: colors.plum,
+        headerTintColor: colors.teal,
         headerStyle: { backgroundColor: colors.cream },
       }}
     />

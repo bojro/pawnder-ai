@@ -7,7 +7,7 @@ export default function TrainingLayout() {
       screenOptions={{
         headerShown: true,
         headerTitle: 'Training Plan',
-        headerTintColor: colors.plum,
+        headerTintColor: colors.teal,
         headerStyle: { backgroundColor: colors.cream },
       }}
     />

@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
   },
   slotSelected: {
-    borderColor: colors.plum,
-    backgroundColor: colors.plumLight,
+    borderColor: colors.teal,
+    backgroundColor: colors.tealLight,
   },
   slotDate: {
     ...typography.labelMd,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: spacing.md,

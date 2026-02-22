@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     borderRadius: sizes.dotSize / 2,
   },
   active: {
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
   },
   inactive: {
     backgroundColor: colors.gray200,

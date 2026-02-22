@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.goldenLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xl,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontFamily: typography.labelMd.fontFamily,
-    color: colors.plum,
+    color: colors.teal,
   },
   infoCard: {
     backgroundColor: colors.white,

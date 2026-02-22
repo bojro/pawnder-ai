@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   brand: {
     ...typography.displayLg,
     fontSize: 48,
-    color: colors.plum,
+    color: colors.teal,
     marginTop: 4,
   },
   tagline: {
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.tealLight,
     justifyContent: 'center',
     alignItems: 'center',
   },

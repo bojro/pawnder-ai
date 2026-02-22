@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import PetImageCarousel from '../../../components/PetImageCarousel';
 import CompatibilityBadge from '../../../components/CompatibilityBadge';
+import RatingBar from '../../../components/RatingBar';
 import ExplainabilityCard from '../../../components/ExplainabilityCard';
 import Button from '../../../components/ui/Button';
 import LoadingOverlay from '../../../components/LoadingOverlay';
@@ -75,6 +76,15 @@ export default function PetDetailScreen() {
             </View>
           ))}
         </View>
+      </View>
+
+      <View style={[styles.card, shadows.card]}>
+        <Text style={styles.cardLabel}>Ratings</Text>
+        <RatingBar label="Activeness" value={pet.energyLevel} />
+        <RatingBar label="Sociability" value={pet.sociability} />
+        <RatingBar label="Shedding / Messiness" value={pet.sheddingLevel} />
+        <RatingBar label="Noise Level" value={pet.barkingLevel} />
+        <RatingBar label="Space Requirement" value={pet.spaceRequirement} />
       </View>
 
       <ExplainabilityCard
@@ -156,14 +166,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   traitChip: {
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.tealLight,
     borderRadius: radii.chip,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },
   traitText: {
     ...typography.labelSm,
-    color: colors.plum,
+    color: colors.teal,
   },
   ctaContainer: {
     padding: spacing.screenPadding,

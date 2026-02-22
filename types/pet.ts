@@ -22,6 +22,8 @@ export interface Pet {
   sheddingLevel: number;
   trainingLevel: number;
   energyLevel: number;
+  sociability: number;
+  spaceRequirement: number;
   specialNeeds: boolean;
   specialNeedsDescription?: string;
   behaviorTraits: BehaviorTrait[];

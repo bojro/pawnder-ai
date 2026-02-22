@@ -6,6 +6,7 @@ import TextArea from '../../components/ui/TextArea';
 import { useAppStore } from '../../store/useAppStore';
 import { adopterService } from '../../services/adopterService';
 import { saveAdopterId } from '../../utils/storage';
+import { TOTAL_ONBOARDING_STEPS } from '../../utils/constants';
 import { spacing } from '../../utils/theme';
 
 export default function OnboardingNarrative() {
@@ -35,8 +36,8 @@ export default function OnboardingNarrative() {
     <OnboardingStep
       title="Share a little about yourself."
       subtitle="These prompts help our AI find your ideal match."
-      currentStep={5}
-      totalSteps={6}
+      currentStep={8}
+      totalSteps={TOTAL_ONBOARDING_STEPS}
       onNext={handleSubmit}
       nextLabel="Finish"
       loading={submitting}

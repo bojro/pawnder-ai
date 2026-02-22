@@ -1,19 +1,27 @@
 import { TextStyle, ViewStyle } from 'react-native';
 
 export const colors = {
-  plum: '#4A154B',
-  plumLight: '#E8DDEF',
-  plumDark: '#33103B',
+  // Primary Brand — Deep Teal (trust + warmth)
+  teal: '#1F7A8C',
+  tealLight: '#E0F2F4',
+  tealDark: '#155A68',
+  // Secondary — Muted Coral (soft pet warmth)
+  coral: '#F28C82',
+  // Accent / CTA — Soft Golden Tan
+  golden: '#E6B566',
+  goldenLight: '#FDF3E0',
+  // Backgrounds
   white: '#FFFFFF',
-  cream: '#FAF8F6',
-  charcoal: '#1A1A1A',
-  gray600: '#555555',
+  cream: '#F7F9F8',        // Warm off-white background
+  // Text
+  charcoal: '#1A1A1A',     // Near-black primary text
+  gray600: '#6B7280',      // Cool gray secondary text
   gray400: '#999999',
   gray200: '#E5E5E5',
   gray100: '#F5F5F5',
-  rose: '#E8658A',
+  // Semantic
   red: '#D32F2F',
-  green: '#4CAF50',
+  green: '#4CAF7A',        // Fresh green success / match
   transparent: 'transparent',
 } as const;
 

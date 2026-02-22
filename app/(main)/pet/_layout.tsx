@@ -8,7 +8,7 @@ export default function PetLayout() {
         headerShown: true,
         headerTitle: '',
         headerBackTitle: 'Back',
-        headerTintColor: colors.plum,
+        headerTintColor: colors.teal,
         headerStyle: { backgroundColor: colors.cream },
       }}
     />

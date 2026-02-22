@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   checked: {
-    backgroundColor: colors.plum,
-    borderColor: colors.plum,
+    backgroundColor: colors.teal,
+    borderColor: colors.teal,
   },
   disabled: {
     opacity: 0.4,

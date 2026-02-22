@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   focused: {
-    borderColor: colors.plum,
+    borderColor: colors.teal,
   },
   hint: {
     ...typography.bodySm,

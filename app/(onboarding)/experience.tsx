@@ -4,74 +4,87 @@ import { router } from 'expo-router';
 import OnboardingStep from '../../components/OnboardingStep';
 import SelectionChip from '../../components/ui/SelectionChip';
 import { useAppStore } from '../../store/useAppStore';
-import { EXPERIENCE_OPTIONS } from '../../utils/constants';
-import { ExperienceLevel } from '../../types';
+import {
+  EXPERIENCE_OPTIONS,
+  PET_TYPE_OPTIONS,
+  TOTAL_ONBOARDING_STEPS,
+} from '../../utils/constants';
+import { ExperienceLevel, PetType } from '../../types';
 import { colors, typography, spacing } from '../../utils/theme';
 
 export default function OnboardingExperience() {
   const { onboardingDraft, updateOnboardingDraft } = useAppStore();
 
+  const togglePetType = (type: PetType) => {
+    const current = onboardingDraft.existingPetTypes;
+    if (current.includes(type)) {
+      updateOnboardingDraft({
+        existingPetTypes: current.filter((t) => t !== type),
+      });
+    } else {
+      updateOnboardingDraft({
+        existingPetTypes: [...current, type],
+      });
+    }
+  };
+
   return (
     <OnboardingStep
       title="What's your experience with pets?"
-      currentStep={3}
-      totalSteps={6}
-      onNext={() => router.push('/(onboarding)/preferences')}
+      currentStep={4}
+      totalSteps={TOTAL_ONBOARDING_STEPS}
+      onNext={() => router.push('/(onboarding)/allergies')}
       nextDisabled={!onboardingDraft.experienceLevel}
     >
-      <View style={styles.content}>
-        <View style={styles.options}>
-          {EXPERIENCE_OPTIONS.map((opt) => (
-            <SelectionChip
-              key={opt.value}
-              label={opt.label}
-              selected={onboardingDraft.experienceLevel === opt.value}
-              onPress={() =>
-                updateOnboardingDraft({
-                  experienceLevel: opt.value as ExperienceLevel,
-                })
-              }
-            />
-          ))}
-        </View>
-
-        <Text style={styles.sectionLabel}>Household</Text>
-        <View style={styles.row}>
+      {/* Experience Level */}
+      <View style={styles.options}>
+        {EXPERIENCE_OPTIONS.map((opt) => (
           <SelectionChip
-            label="I have kids"
-            selected={onboardingDraft.hasKids}
-            onPress={() =>
-              updateOnboardingDraft({ hasKids: !onboardingDraft.hasKids })
-            }
-          />
-          <SelectionChip
-            label="I have other pets"
-            selected={onboardingDraft.hasExistingPets}
+            key={opt.value}
+            label={`${opt.label}\n${opt.subtitle}`}
+            selected={onboardingDraft.experienceLevel === opt.value}
             onPress={() =>
               updateOnboardingDraft({
-                hasExistingPets: !onboardingDraft.hasExistingPets,
+                experienceLevel: opt.value as ExperienceLevel,
               })
             }
           />
-        </View>
+        ))}
+      </View>
+
+      {/* Pet Types */}
+      <Text style={styles.sectionLabel}>Current Pets in Household</Text>
+      <View style={styles.petGrid}>
+        {PET_TYPE_OPTIONS.map((opt) => (
+          <SelectionChip
+            key={opt.value}
+            label={opt.label}
+            selected={onboardingDraft.existingPetTypes.includes(opt.value as PetType)}
+            onPress={() => togglePetType(opt.value as PetType)}
+            style={styles.petChip}
+          />
+        ))}
       </View>
     </OnboardingStep>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
-    gap: spacing.xl,
-  },
   options: {
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   sectionLabel: {
     ...typography.labelMd,
     color: colors.gray600,
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
   },
-  row: {
+  petGrid: {
     flexDirection: 'row',
-    gap: spacing.md,
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  petChip: {
+    marginBottom: 0,
   },
 });

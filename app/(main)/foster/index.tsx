@@ -60,7 +60,7 @@ export default function FosterDashboard() {
           <MetricCard
             label="Bond"
             value={formatScore(stabilitySummary?.bondScore ?? activeMatch.bondScore)}
-            color={colors.plum}
+            color={colors.teal}
           />
           <MetricCard
             label="Incidents"
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.tealLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xl,

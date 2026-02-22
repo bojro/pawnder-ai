@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../../utils/theme';
 
 interface SliderProps {
@@ -7,8 +8,10 @@ interface SliderProps {
   value: number;
   min?: number;
   max?: number;
+  step?: number;
   onValueChange: (value: number) => void;
   labels?: string[];
+  icon?: keyof typeof Ionicons.glyphMap;
 }
 
 export default function Slider({
@@ -16,43 +19,54 @@ export default function Slider({
   value,
   min = 1,
   max = 5,
+  step = 1,
   onValueChange,
   labels,
+  icon,
 }: SliderProps) {
-  const steps = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  const steps = Array.from(
+    { length: Math.floor((max - min) / step) + 1 },
+    (_, i) => min + i * step,
+  );
+
+  const fillPercent = max === min ? 0 : ((value - min) / (max - min)) * 100;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelRow}>
+        {icon && <Ionicons name={icon} size={18} color={colors.teal} style={styles.labelIcon} />}
+        <Text style={styles.label}>{label}</Text>
+      </View>
       <View style={styles.trackContainer}>
         <View style={styles.track}>
           <View
             style={[
               styles.trackFill,
-              { width: `${((value - min) / (max - min)) * 100}%` },
+              { width: `${fillPercent}%` },
             ]}
           />
         </View>
         <View style={styles.stepsRow}>
-          {steps.map((step) => (
-            <View
-              key={step}
-              style={[styles.stepTouchable]}
-              onTouchEnd={() => onValueChange(step)}
+          {steps.map((stepVal, idx) => (
+            <TouchableOpacity
+              key={stepVal}
+              activeOpacity={0.7}
+              onPress={() => onValueChange(stepVal)}
+              style={styles.stepTouchable}
             >
               <View
                 style={[
                   styles.dot,
-                  step <= value && styles.dotActive,
-                  step === value && styles.dotCurrent,
+                  stepVal <= value && styles.dotActive,
+                  stepVal === value && styles.dotCurrent,
                 ]}
               />
-              {labels && labels[step - min] ? (
-                <Text style={styles.stepLabel}>{labels[step - min]}</Text>
+              {labels && labels[idx] !== undefined ? (
+                <Text style={styles.stepLabel}>{labels[idx]}</Text>
               ) : (
-                <Text style={styles.stepLabel}>{step}</Text>
+                <Text style={styles.stepLabel}>{stepVal}</Text>
               )}
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </View>
@@ -64,10 +78,17 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.lg,
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  labelIcon: {
+    marginRight: 6,
+  },
   label: {
     ...typography.bodyMd,
     color: colors.charcoal,
-    marginBottom: spacing.md,
   },
   trackContainer: {
     paddingHorizontal: 4,
@@ -80,7 +101,7 @@ const styles = StyleSheet.create({
   },
   trackFill: {
     height: 4,
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
     borderRadius: 2,
   },
   stepsRow: {
@@ -100,10 +121,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dotActive: {
-    backgroundColor: colors.plumLight,
+    backgroundColor: colors.tealLight,
   },
   dotCurrent: {
-    backgroundColor: colors.plum,
+    backgroundColor: colors.teal,
     width: 16,
     height: 16,
     borderRadius: 8,

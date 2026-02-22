@@ -5,6 +5,7 @@ import OnboardingStep from '../../components/OnboardingStep';
 import Slider from '../../components/ui/Slider';
 import SelectionChip from '../../components/ui/SelectionChip';
 import { useAppStore } from '../../store/useAppStore';
+import { TOTAL_ONBOARDING_STEPS } from '../../utils/constants';
 import { spacing } from '../../utils/theme';
 
 export default function OnboardingPreferences() {
@@ -14,8 +15,8 @@ export default function OnboardingPreferences() {
     <OnboardingStep
       title="Set your tolerance levels."
       subtitle="Help us avoid dealbreakers."
-      currentStep={4}
-      totalSteps={6}
+      currentStep={7}
+      totalSteps={TOTAL_ONBOARDING_STEPS}
       onNext={() => router.push('/(onboarding)/narrative')}
     >
       <View style={styles.content}>

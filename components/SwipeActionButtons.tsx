@@ -30,7 +30,7 @@ export default function SwipeActionButtons({
         activeOpacity={0.8}
         style={[styles.button, shadows.actionButton, disabled && styles.disabled]}
       >
-        <Ionicons name="heart" size={sizes.iconSizeAction} color={colors.rose} />
+        <Ionicons name="heart" size={sizes.iconSizeAction} color={colors.coral} />
       </TouchableOpacity>
     </View>
   );
